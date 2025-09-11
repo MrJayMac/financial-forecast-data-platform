@@ -1,0 +1,36 @@
+### Common Data Sources
+
+1. **Relational Databases**  
+   - Used by internal systems (SQL Server, Oracle, MySQL, IBM DB2).  
+   - Store structured data for transactions, HR, workflows, etc.  
+   - Examples: sales analysis, CRM data for projections.  
+
+2. **Flat Files & Spreadsheets**  
+   - Flat files (CSV, TXT): plain text, one row per line, values separated by delimiters.  
+   - Spreadsheets (Excel, Google Sheets, Apple Numbers): tabular format, multiple worksheets, can include formulas/formatting.  
+
+3. **XML Files**  
+   - Use tags to define data, support hierarchical structures.  
+   - Examples: survey data, bank statements.  
+
+4. **APIs & Web Services**  
+   - Provide data in formats like JSON, XML, HTML, or media.  
+   - Examples:  
+     - Social media APIs (Twitter, Facebook) for sentiment analysis.  
+     - Stock market APIs for prices and trading.  
+     - Data lookup APIs for validation (e.g., postal code → city/state).  
+
+5. **Web Scraping**  
+   - Extracts structured info from websites.  
+   - Uses tools like BeautifulSoup, Scrapy, Selenium.  
+   - Applications: price comparison, lead generation, forum data mining, ML training datasets.  
+
+6. **Data Streams**  
+   - Continuous flows from IoT, sensors, apps, GPS, social media, etc.  
+   - Typically timestamped and geo-tagged.  
+   - Uses: financial trading, retail demand prediction, surveillance, industrial monitoring, web click tracking, flight rebooking.  
+   - Tools: Apache Kafka, Spark Streaming, Storm.  
+
+7. **RSS Feeds**  
+   - Provide constant updates from news sites and forums.  
+   - Consumed via feed readers.  

@@ -1,0 +1,17 @@
+### Types of Data
+
+- **Structured Data**  
+  - Well-defined, stored in schemas (rows/columns).  
+  - Easy to analyze with standard tools.  
+  - Examples: SQL databases, OLTP systems, spreadsheets, online forms, GPS/RFID sensor data, server logs.  
+
+- **Semi-Structured Data**  
+  - Some organization but no fixed schema.  
+  - Uses tags/elements (metadata) for hierarchy.  
+  - Examples: Emails, XML/JSON, binaries, TCP/IP packets, zipped files, integrated datasets.  
+
+- **Unstructured Data**  
+  - No clear structure, not organized in rows/columns.  
+  - Wide variety of formats and sources.  
+  - Examples: Web pages, social media feeds, images (JPEG/PNG), audio/video, PDFs, Word docs, PPTs, surveys, media logs.  
+  - Often stored in documents or NoSQL databases.  
