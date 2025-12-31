@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+.env.*
+.DS_Store
+.dist/
+dist/
+build/
+.coverage
+htmlcov/
+.cache/
+.mypy_cache/
+.pytest_cache/
+.dbt/
+dbt_packages/
+
+# IDE
+.vscode/
+.idea/
+
+# Terraform
+.terraform/
+terraform.tfstate*
+.terraform.lock.hcl
