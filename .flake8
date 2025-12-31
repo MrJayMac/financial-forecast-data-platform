@@ -1,0 +1,10 @@
+[flake8]
+max-line-length = 120
+extend-ignore = E501,E302,E305
+per-file-ignores =
+    orchestration/flows.py:F401
+    ingestion/app/main.py:F401
+    tests/test_ingestion.py:F401
+    forecasting/arima.py:F401
+    forecasting/models.py:F401
+    analytics/app/main.py:E302
