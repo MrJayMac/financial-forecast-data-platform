@@ -23,7 +23,7 @@ def process_event(session: Session, event_type: EventType, payload: dict[str, An
     # Parse by type with validation; quarantine on failure
     schema_cls = EventSchemaMap[event_type]
     try:
-        obj = schema_cls.model_validate(payload)
+        obj = schema_cls(**payload)
     except ValidationError as ve:
         # Populate minimal required fields for quarantine row
         now = datetime.now(timezone.utc)
