@@ -30,7 +30,7 @@ def make_session():
 def test_process_event_accept_and_duplicate(monkeypatch):
     # Patch S3 uploader
     dummy = DummyS3()
-    monkeypatch.setattr("platform_common.s3.put_json", dummy.put_json)
+    monkeypatch.setattr("ingestion.app.service.put_json", dummy.put_json)
 
     session = make_session()
 
@@ -53,7 +53,7 @@ def test_process_event_accept_and_duplicate(monkeypatch):
 
 def test_process_event_late_arrival(monkeypatch):
     dummy = DummyS3()
-    monkeypatch.setattr("platform_common.s3.put_json", dummy.put_json)
+    monkeypatch.setattr("ingestion.app.service.put_json", dummy.put_json)
 
     session = make_session()
 
