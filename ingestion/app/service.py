@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import Any
+import json
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -53,7 +54,7 @@ def process_event(session: Session, event_type: EventType, payload: dict[str, An
         return IngestionResult(status="duplicate", event_id=obj.event_id, event_type=event_type)
 
     # Quality evaluation
-    q = evaluate_quality(obj.model_dump(), event_type)
+    q = evaluate_quality(json.loads(obj.model_dump_json()), event_type)
 
     if not q.is_valid:
         # Quarantine record
@@ -63,7 +64,7 @@ def process_event(session: Session, event_type: EventType, payload: dict[str, An
             event_time=obj.event_time,
             customer_id=obj.customer_id,
             region=obj.region,
-            payload=obj.model_dump(),
+            payload=json.loads(obj.model_dump_json()),
             issues=",".join(q.issues),
         )
         session.add(eq)
@@ -72,7 +73,7 @@ def process_event(session: Session, event_type: EventType, payload: dict[str, An
 
     # Accepted: write to S3 (idempotent write)
     key = s3_key_for(event_type, obj.event_id, obj.event_time)
-    put_json(key, obj.model_dump())
+    put_json(key, json.loads(obj.model_dump_json()))
 
     er = EventRaw(
         event_id=obj.event_id,
@@ -80,7 +81,7 @@ def process_event(session: Session, event_type: EventType, payload: dict[str, An
         event_time=obj.event_time,
         customer_id=obj.customer_id,
         region=obj.region,
-        payload=obj.model_dump(),
+        payload=json.loads(obj.model_dump_json()),
         s3_key=key,
         is_late=q.is_late,
     )
