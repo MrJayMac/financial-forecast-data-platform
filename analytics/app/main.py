@@ -4,6 +4,7 @@ from datetime import date, datetime
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import HTMLResponse
 from loguru import logger
 from pydantic import BaseModel
 from sqlalchemy import text
@@ -31,6 +32,110 @@ def on_startup() -> None:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/", response_class=HTMLResponse)
+def dashboard() -> str:
+    return """
+    <!doctype html>
+    <html lang=\"en\">
+    <head>
+      <meta charset=\"utf-8\" />
+      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+      <title>FFDP Dashboard</title>
+      <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; color: #0f172a; }
+        h1 { margin-bottom: 8px; }
+        h2 { margin-top: 24px; }
+        .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 12px 0; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #e5e7eb; }
+        .muted { color: #64748b; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+        code.badge { background: #f1f5f9; padding: 2px 6px; border-radius: 6px; }
+      </style>
+    </head>
+    <body>
+      <h1>FFDP Dashboard</h1>
+      <div class=\"muted\">Simple view of key metrics from the Analytics API.</div>
+
+      <div class=\"grid\">
+        <div class=\"card\">
+          <h2>MRR</h2>
+          <div id=\"mrr\">Loading...</div>
+        </div>
+        <div class=\"card\">
+          <h2>Churn</h2>
+          <div id=\"churn\">Loading...</div>
+        </div>
+      </div>
+
+      <div class=\"card\">
+        <h2>Revenue by Region</h2>
+        <div class=\"muted\">Latest rows</div>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Region</th><th>Revenue</th></tr>
+          </thead>
+          <tbody id=\"rev-rows\"><tr><td colspan=3>Loading...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class=\"card\">
+        <h2>Forecast vs Actual</h2>
+        <div class=\"muted\">Latest rows</div>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Actual</th><th>Forecast</th><th>Variance</th><th>Variance %</th></tr>
+          </thead>
+          <tbody id=\"fa-rows\"><tr><td colspan=5>Loading...</td></tr></tbody>
+        </table>
+      </div>
+
+      <script>
+        async function getJSON(path) {
+          const r = await fetch(path);
+          if (!r.ok) throw new Error('Request failed: ' + r.status);
+          return r.json();
+        }
+
+        function setText(id, text) { document.getElementById(id).textContent = text; }
+
+        function fmtMoney(v) { return '$' + Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+        function renderRows(elId, rows, cols) {
+          const el = document.getElementById(elId);
+          if (!rows || rows.length === 0) { el.innerHTML = '<tr><td colspan=\"' + cols + '\">No data</td></tr>'; return; }
+          el.innerHTML = rows.map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('');
+        }
+
+        (async () => {
+          try {
+            const mrr = await getJSON('/metrics/mrr');
+            setText('mrr', `Month ${mrr.month}: ${fmtMoney(mrr.mrr)}`);
+          } catch (e) { setText('mrr', 'No data'); }
+
+          try {
+            const churn = await getJSON('/metrics/churn');
+            setText('churn', `Date ${churn.date}: Cancellations ${churn.cancellations}, Prev Active ${churn.prev_active}, Rate ${(churn.churn_rate*100).toFixed(2)}%`);
+          } catch (e) { setText('churn', 'No data'); }
+
+          try {
+            const rev = await getJSON('/metrics/revenue_by_region');
+            const recent = rev.rows.slice(-10);
+            renderRows('rev-rows', recent.map(r => [r.date_key, r.region_key, fmtMoney(r.revenue_amount)]), 3);
+          } catch (e) { renderRows('rev-rows', [], 3); }
+
+          try {
+            const fa = await getJSON('/metrics/forecast_vs_actual');
+            const recent = fa.rows.slice(-10);
+            renderRows('fa-rows', recent.map(r => [r.date, fmtMoney(r.actual), fmtMoney(r.forecast), fmtMoney(r.variance), (Number(r.variance_pct)*100).toFixed(2)+'%']), 5);
+          } catch (e) { renderRows('fa-rows', [], 5); }
+        })();
+      </script>
+    </body>
+    </html>
+    """
 
 
 class RevenueByRegionResponse(BaseModel):
